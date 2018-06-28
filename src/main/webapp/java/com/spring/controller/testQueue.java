@@ -9,7 +9,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,12 +36,28 @@ public class testQueue {
         System.out.println("访问进来！！");
         try {
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("data", "hello rabbitmq");
+            List<String> list=null;
+            for(int i=0; i<10; i++){
+                new Thread("" + i){
+                    @Override
+                    public void run(){
+                        sendMessage();
+                    }
+                }.start();
+            }
+
+
             // 注意：第二个属性是 Queue 与 交换机绑定的路由
-            producer.sendQueue(queueId + "_exchange", queueId + "_patt", map);
+            //producer.sendQueue(queueId + "_exchange", queueId + "_patt", map);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return "发送完毕";
+        return "success";
+    }
+    public void sendMessage(){
+        for(int i=1;i<30000;i++){
+            String a="年轻人，多学习，多看报，不要犹豫，日写代码三百行，月薪上万不是梦!!"+i;
+            producer.sendQueue(queueId + "_exchange", queueId + "_patt", a);
+        }
     }
 }
